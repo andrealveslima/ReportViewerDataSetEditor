@@ -140,7 +140,6 @@
             this.btNewDataSet.TabIndex = 2;
             this.btNewDataSet.Text = "New DataSet";
             this.btNewDataSet.UseVisualStyleBackColor = true;
-            this.btNewDataSet.Click += new System.EventHandler(this.btOpen_Click);
             // 
             // FormMain
             // 
