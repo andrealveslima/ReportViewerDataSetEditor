@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -10,19 +11,19 @@ namespace ReportViewerDataSetEditor
 {
     public class DataSetParser
     {
-        public string[] DataSetNames { get; set; }
-        public Dictionary<string, DataTable> DataSets { get; set; }
+        public BindingList<string> DataSetNames { get; private set; }
+        public Dictionary<string, DataTable> DataSets { get; private set; }
 
         public DataSetParser(string reportPath)
         {
             DataSets = new Dictionary<string, DataTable>();
+            DataSetNames = new BindingList<string>();
 
             var doc = XDocument.Load(reportPath);
             var reportTag = doc.Descendants().First();
             var ns = reportTag.GetDefaultNamespace();
             var rdNamespace = reportTag.GetNamespaceOfPrefix("rd");
             var dataSets = reportTag.Descendants(ns + "DataSet");
-            var dataSetNames = new List<string>();
 
             foreach (var dataSet in dataSets)
             {
@@ -36,11 +37,9 @@ namespace ReportViewerDataSetEditor
                     dataTable.Rows.Add(dataField, typeName);
                 }
 
-                dataSetNames.Add(dataSetName);
+                DataSetNames.Add(dataSetName);
                 DataSets.Add(dataSetName, dataTable);
             }
-
-            DataSetNames = dataSetNames.ToArray();
         }
 
         private DataTable CreateDataTable()
@@ -49,6 +48,12 @@ namespace ReportViewerDataSetEditor
             dataTable.Columns.Add("DataField");
             dataTable.Columns.Add("TypeName");
             return dataTable;
+        }
+
+        public void AddDataSet(string dataSetName)
+        {
+            DataSets.Add(dataSetName, CreateDataTable());
+            DataSetNames.Add(dataSetName);
         }
     }
 }

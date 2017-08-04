@@ -134,12 +134,14 @@
             // 
             // btNewDataSet
             // 
+            this.btNewDataSet.Enabled = false;
             this.btNewDataSet.Location = new System.Drawing.Point(191, 68);
             this.btNewDataSet.Name = "btNewDataSet";
             this.btNewDataSet.Size = new System.Drawing.Size(161, 23);
             this.btNewDataSet.TabIndex = 2;
             this.btNewDataSet.Text = "New DataSet";
             this.btNewDataSet.UseVisualStyleBackColor = true;
+            this.btNewDataSet.Click += new System.EventHandler(this.btNewDataSet_Click);
             // 
             // FormMain
             // 
