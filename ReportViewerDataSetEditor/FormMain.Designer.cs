@@ -36,9 +36,9 @@
             this.btSaveChanges = new System.Windows.Forms.Button();
             this.lblColumns = new System.Windows.Forms.Label();
             this.dgvColumns = new System.Windows.Forms.DataGridView();
-            this.ColumnDataField = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColumnTypeName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btNewDataSet = new System.Windows.Forms.Button();
+            this.ColumnDataField = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnTypeName = new System.Windows.Forms.DataGridViewComboBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).BeginInit();
             this.SuspendLayout();
             // 
@@ -91,12 +91,14 @@
             // 
             // btSaveChanges
             // 
+            this.btSaveChanges.Enabled = false;
             this.btSaveChanges.Location = new System.Drawing.Point(462, 28);
             this.btSaveChanges.Name = "btSaveChanges";
             this.btSaveChanges.Size = new System.Drawing.Size(98, 23);
             this.btSaveChanges.TabIndex = 2;
             this.btSaveChanges.Text = "Save changes";
             this.btSaveChanges.UseVisualStyleBackColor = true;
+            this.btSaveChanges.Click += new System.EventHandler(this.btSaveChanges_Click);
             // 
             // lblColumns
             // 
@@ -113,10 +115,22 @@
             this.dgvColumns.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColumnDataField,
             this.ColumnTypeName});
+            this.dgvColumns.Enabled = false;
             this.dgvColumns.Location = new System.Drawing.Point(16, 111);
             this.dgvColumns.Name = "dgvColumns";
             this.dgvColumns.Size = new System.Drawing.Size(544, 274);
             this.dgvColumns.TabIndex = 4;
+            // 
+            // btNewDataSet
+            // 
+            this.btNewDataSet.Enabled = false;
+            this.btNewDataSet.Location = new System.Drawing.Point(191, 68);
+            this.btNewDataSet.Name = "btNewDataSet";
+            this.btNewDataSet.Size = new System.Drawing.Size(161, 23);
+            this.btNewDataSet.TabIndex = 2;
+            this.btNewDataSet.Text = "New DataSet";
+            this.btNewDataSet.UseVisualStyleBackColor = true;
+            this.btNewDataSet.Click += new System.EventHandler(this.btNewDataSet_Click);
             // 
             // ColumnDataField
             // 
@@ -130,18 +144,9 @@
             this.ColumnTypeName.DataPropertyName = "TypeName";
             this.ColumnTypeName.HeaderText = "Type Name";
             this.ColumnTypeName.Name = "ColumnTypeName";
+            this.ColumnTypeName.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.ColumnTypeName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this.ColumnTypeName.Width = 150;
-            // 
-            // btNewDataSet
-            // 
-            this.btNewDataSet.Enabled = false;
-            this.btNewDataSet.Location = new System.Drawing.Point(191, 68);
-            this.btNewDataSet.Name = "btNewDataSet";
-            this.btNewDataSet.Size = new System.Drawing.Size(161, 23);
-            this.btNewDataSet.TabIndex = 2;
-            this.btNewDataSet.Text = "New DataSet";
-            this.btNewDataSet.UseVisualStyleBackColor = true;
-            this.btNewDataSet.Click += new System.EventHandler(this.btNewDataSet_Click);
             // 
             // FormMain
             // 
@@ -175,9 +180,9 @@
         private System.Windows.Forms.Button btSaveChanges;
         private System.Windows.Forms.Label lblColumns;
         private System.Windows.Forms.DataGridView dgvColumns;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnDataField;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnTypeName;
         private System.Windows.Forms.Button btNewDataSet;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnDataField;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ColumnTypeName;
     }
 }
 

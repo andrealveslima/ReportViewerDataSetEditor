@@ -29,8 +29,11 @@ namespace ReportViewerDataSetEditor
                 {
                     tbReportPath.Text = dialog.FileName;
                     _dataSetParser = new DataSetParser(tbReportPath.Text);
+                    ColumnTypeName.DataSource = _dataSetParser.AvailableTypes;
                     cbDataSet.Enabled = true;
                     btNewDataSet.Enabled = true;
+                    dgvColumns.Enabled = true;
+                    btSaveChanges.Enabled = true;
                     cbDataSet.DataSource = _dataSetParser.DataSetNames;
                 }
             }
@@ -53,6 +56,11 @@ namespace ReportViewerDataSetEditor
             {
                 MessageBox.Show("A DataSet with this name already exists.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btSaveChanges_Click(object sender, EventArgs e)
+        {
+            _dataSetParser.SaveChanges();
         }
     }
 }
