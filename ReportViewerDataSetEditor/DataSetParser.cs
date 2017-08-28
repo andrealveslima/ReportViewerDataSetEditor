@@ -92,56 +92,99 @@ namespace ReportViewerDataSetEditor
         {
             var doc = XDocument.Load(_reportPath);
             var reportTag = doc.Descendants().First();
-            var ns = reportTag.GetDefaultNamespace();
+            var defaultNamespace = reportTag.GetDefaultNamespace();
             var rdNamespace = reportTag.GetNamespaceOfPrefix("rd");
-            var dataSetsElement = reportTag.Descendants(ns + "DataSets");
+            var dataSetsTag = reportTag.Descendants(defaultNamespace + "DataSets");
+            var dataSourcesTag = reportTag.Descendants(defaultNamespace + "DataSources");
 
-            if (dataSetsElement == null || !dataSetsElement.Any())
+            if (dataSetsTag == null || !dataSetsTag.Any())
             {
-                reportTag.Add(new XElement(ns + "DataSets"));
-                dataSetsElement = reportTag.Descendants(ns + "DataSets");
+                reportTag.Add(new XElement(defaultNamespace + "DataSets"));
+                dataSetsTag = reportTag.Descendants(defaultNamespace + "DataSets");
             }
 
-            var dataSetElements = dataSetsElement.Descendants(ns + "DataSet");
+            if (dataSourcesTag == null || !dataSourcesTag.Any())
+            {
+                reportTag.Add(new XElement(defaultNamespace + "DataSources"));
+                dataSourcesTag = reportTag.Descendants(defaultNamespace + "DataSources");
+            }
+
+            var dataSetTags = dataSetsTag.Descendants(defaultNamespace + "DataSet");
+            var dataSourceTags = dataSourcesTag.Descendants(defaultNamespace + "DataSource");
 
             foreach (var dataSetName in DataSetNames)
             {
-                if (!dataSetElements.Any(ds => string.Compare(ds.Attribute("Name").Value, dataSetName, StringComparison.InvariantCultureIgnoreCase) == 0))
+                if (!dataSetTags.Any(ds => string.Compare(ds.Attribute("Name").Value, dataSetName, StringComparison.InvariantCultureIgnoreCase) == 0))
                 {
-                    var newDataSet = new XElement(ns + "DataSet");
+                    var newDataSet = new XElement(defaultNamespace + "DataSet");
                     newDataSet.SetAttributeValue("Name", dataSetName);
-                    newDataSet.Add(new XElement(ns + "Fields"));
-                    dataSetsElement.First().Add(newDataSet);
-                    dataSetElements = dataSetsElement.Descendants(ns + "DataSet");
+
+                    var queryTag = new XElement(defaultNamespace + "Query");
+                    var dataSourceNameTag = new XElement(defaultNamespace + "DataSourceName");
+                    dataSourceNameTag.Value = dataSetName;
+                    var commandTextTag = new XElement(defaultNamespace + "CommandText");
+                    commandTextTag.Value = "/* Local Query */";
+                    queryTag.Add(dataSourceNameTag);
+                    queryTag.Add(commandTextTag);
+
+                    newDataSet.Add(queryTag);
+                    newDataSet.Add(new XElement(defaultNamespace + "Fields"));
+
+                    dataSetsTag.First().Add(newDataSet);
+                    dataSetTags = dataSetsTag.Descendants(defaultNamespace + "DataSet");
                 }
 
-                var dataSetElement = dataSetElements.First(ds => string.Compare(ds.Attribute("Name").Value, dataSetName, StringComparison.InvariantCultureIgnoreCase) == 0);
+                if (!dataSourceTags.Any(ds => string.Compare(ds.Attribute("Name").Value, dataSetName, StringComparison.InvariantCultureIgnoreCase) == 0))
+                {
+                    var newDataSource = new XElement(defaultNamespace + "DataSource");
+                    newDataSource.SetAttributeValue("Name", dataSetName);
 
+                    var connectionPropertiesTag = new XElement(defaultNamespace + "ConnectionProperties");
+                    var dataProviderTag = new XElement(defaultNamespace + "DataProvider");
+                    dataProviderTag.Value = "System.Data.DataSet";
+                    var connectStringTag = new XElement(defaultNamespace + "ConnectString");
+                    connectStringTag.Value = "/* Local Connection */";
+                    connectionPropertiesTag.Add(dataProviderTag);
+                    connectionPropertiesTag.Add(connectStringTag);
+
+                    newDataSource.Add(connectionPropertiesTag);
+                    dataSourcesTag.First().Add(newDataSource);
+                    dataSourceTags = dataSourcesTag.Descendants(defaultNamespace + "DataSource");
+                }
+
+                var currentDataSetTag = dataSetTags.First(ds => string.Compare(ds.Attribute("Name").Value, dataSetName, StringComparison.InvariantCultureIgnoreCase) == 0);
+                var fieldsTag = currentDataSetTag.Descendants(defaultNamespace + "Fields");
+                var fieldTags = fieldsTag.Descendants(defaultNamespace + "Field");
+
+                if (fieldTags.Any())
+                {
+                    foreach (var fieldTag in fieldTags.ToArray())
+                    {
+                        fieldTag.Remove();
+                    }
+                }
+
+                foreach (DataRow field in DataSets[dataSetName].Rows)
+                {
+                    var fieldName = field["DataField"].ToString();
+                    var typeName = field["TypeName"].ToString();
+
+                    var fieldTag = new XElement(defaultNamespace + "Field");
+                    fieldTag.SetAttributeValue("Name", fieldName);
+
+                    var dataFieldTag = new XElement(defaultNamespace + "DataField");
+                    dataFieldTag.Value = fieldName;
+                    var typeNameTag = new XElement(rdNamespace + "TypeName");
+                    typeNameTag.Value = typeName;
+
+                    fieldTag.Add(dataFieldTag);
+                    fieldTag.Add(typeNameTag);
+
+                    fieldsTag.First().Add(fieldTag);
+                }
             }
 
             doc.Save(_reportPath);
-
-
-            //if (dataSets == null)
-            //{
-            //    dataSets = new XElement("DataSets");
-            //}
-
-            //foreach (var dataSet in dataSets)
-            //{
-            //    var dataSetName = dataSet.Attribute("Name").Value;
-            //    var fields = dataSet.Descendants(ns + "Field");
-            //    var dataTable = CreateDataTable();
-            //    foreach (var field in fields)
-            //    {
-            //        var dataField = field.Element(ns + "DataField").Value;
-            //        var typeName = field.Element(rdNamespace + "TypeName").Value;
-            //        dataTable.Rows.Add(dataField, typeName);
-            //    }
-
-            //    DataSetNames.Add(dataSetName);
-            //    DataSets.Add(dataSetName, dataTable);
-            //}
         }
     }
 }
